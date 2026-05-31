@@ -1,0 +1,112 @@
+# ============================================
+# GitHub Actions CI/CD Pipeline
+# Author: Own Ali
+# Roll No: F20232661030
+# Description: Automatically runs on every push.
+#              Tests all Python scripts, checks
+#              syntax, and validates project structure.
+# ============================================
+
+name: Network Automation CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  # ── Job 1: Syntax Check ──
+  syntax-check:
+    name: Python Syntax Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Check Python syntax - device_inventory.py
+        run: python -m py_compile scripts/device_inventory.py && echo "device_inventory.py - OK"
+
+      - name: Check Python syntax - config_generator.py
+        run: python -m py_compile scripts/config_generator.py && echo "config_generator.py - OK"
+
+      - name: Check Python syntax - network_verification.py
+        run: python -m py_compile scripts/network_verification.py && echo "network_verification.py - OK"
+
+      - name: Check Python syntax - config_backup.py
+        run: python -m py_compile scripts/config_backup.py && echo "config_backup.py - OK"
+
+  # ── Job 2: Run Scripts ──
+  run-scripts:
+    name: Run and Test Scripts
+    runs-on: ubuntu-latest
+    needs: syntax-check
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install netmiko paramiko
+
+      - name: Run device inventory script
+        run: python scripts/device_inventory.py
+
+      - name: Run config generator script
+        run: python scripts/config_generator.py
+
+      - name: Run config backup script
+        run: python scripts/config_backup.py
+
+      - name: Run network verification script
+        run: python scripts/network_verification.py
+
+  # ── Job 3: Validate Project Structure ──
+  validate-structure:
+    name: Validate Project Structure
+    runs-on: ubuntu-latest
+    needs: run-scripts
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Check scripts folder exists
+        run: test -d scripts && echo "scripts/ folder - OK"
+
+      - name: Check playbooks folder exists
+        run: test -d playbooks && echo "playbooks/ folder - OK"
+
+      - name: Check configs folder exists
+        run: test -d configs && echo "configs/ folder - OK"
+
+      - name: Check docs folder exists
+        run: test -d docs && echo "docs/ folder - OK"
+
+      - name: Check all scripts exist
+        run: |
+          test -f scripts/device_inventory.py    && echo "device_inventory.py    - OK"
+          test -f scripts/config_generator.py    && echo "config_generator.py    - OK"
+          test -f scripts/network_verification.py && echo "network_verification.py - OK"
+          test -f scripts/config_backup.py       && echo "config_backup.py       - OK"
+
+      - name: Check Ansible playbooks exist
+        run: |
+          test -f playbooks/configure_routers.yml && echo "configure_routers.yml - OK"
+          test -f playbooks/verify_network.yml    && echo "verify_network.yml    - OK"
+          test -f playbooks/inventory.ini         && echo "inventory.ini         - OK"
+
+      - name: All checks passed
+        run: echo "Project structure is valid and all scripts are working."
