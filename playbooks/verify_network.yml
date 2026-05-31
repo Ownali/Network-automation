@@ -1,0 +1,49 @@
+# ============================================
+# Ansible Playbook: Network Verification
+# Author: Own Ali
+# Roll No: F20232661030
+# Description: Verifies connectivity across
+#              all routers by checking interfaces
+#              and routing table
+# ============================================
+
+---
+- name: Verify Network Connectivity
+  hosts: routers
+  gather_facts: no
+  connection: network_cli
+
+  tasks:
+
+    # ── Task 1: Check interface status ──
+    - name: Get interface summary
+      ios_command:
+        commands:
+          - show ip interface brief
+      register: interface_output
+
+    - name: Display interface status
+      debug:
+        msg: "{{ interface_output.stdout_lines }}"
+
+    # ── Task 2: Check routing table ──
+    - name: Get routing table
+      ios_command:
+        commands:
+          - show ip route
+      register: route_output
+
+    - name: Display routing table
+      debug:
+        msg: "{{ route_output.stdout_lines }}"
+
+    # ── Task 3: Check OSPF neighbors ──
+    - name: Get OSPF neighbor status
+      ios_command:
+        commands:
+          - show ip ospf neighbor
+      register: ospf_output
+
+    - name: Display OSPF neighbors
+      debug:
+        msg: "{{ ospf_output.stdout_lines }}"

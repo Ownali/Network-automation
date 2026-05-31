@@ -1,0 +1,118 @@
+# ============================================
+# Ansible Playbook: Network Configuration
+# Author: Own Ali
+# Roll No: F20232661030
+# Description: Automatically configures all
+#              routers using Ansible tasks.
+#              Deploys interfaces and OSPF routing.
+# ============================================
+
+---
+- name: Configure All Network Routers
+  hosts: routers
+  gather_facts: no
+  connection: network_cli
+
+  tasks:
+
+    # ── Task 1: Set hostname ──
+    - name: Set device hostname
+      ios_config:
+        lines:
+          - "hostname {{ inventory_hostname }}"
+
+    # ── Task 2: Configure LAN interfaces ──
+    - name: Configure LAN interface - Router0
+      ios_config:
+        lines:
+          - description LAN - Switch0
+          - ip address 192.168.1.1 255.255.255.0
+          - no shutdown
+        parents: interface GigabitEthernet0/0
+      when: inventory_hostname == "Router0"
+
+    - name: Configure LAN interface - Router1
+      ios_config:
+        lines:
+          - description LAN - Switch1
+          - ip address 192.168.2.1 255.255.255.0
+          - no shutdown
+        parents: interface GigabitEthernet0/0
+      when: inventory_hostname == "Router1"
+
+    - name: Configure LAN interface - Router2
+      ios_config:
+        lines:
+          - description LAN - Switch2
+          - ip address 192.168.3.1 255.255.255.0
+          - no shutdown
+        parents: interface GigabitEthernet0/0
+      when: inventory_hostname == "Router2"
+
+    # ── Task 3: Configure WAN interfaces ──
+    - name: Configure WAN interface Gig0/1 - Router0
+      ios_config:
+        lines:
+          - description WAN - Link to Router1
+          - ip address 10.0.0.1 255.255.255.252
+          - no shutdown
+        parents: interface GigabitEthernet0/1
+      when: inventory_hostname == "Router0"
+
+    - name: Configure WAN interface Gig0/1 - Router1
+      ios_config:
+        lines:
+          - description WAN - Link to Router0
+          - ip address 10.0.0.2 255.255.255.252
+          - no shutdown
+        parents: interface GigabitEthernet0/1
+      when: inventory_hostname == "Router1"
+
+    - name: Configure WAN interface Gig0/2 - Router1
+      ios_config:
+        lines:
+          - description WAN - Link to Router2
+          - ip address 10.0.0.5 255.255.255.252
+          - no shutdown
+        parents: interface GigabitEthernet0/2
+      when: inventory_hostname == "Router1"
+
+    - name: Configure WAN interface Gig0/1 - Router2
+      ios_config:
+        lines:
+          - description WAN - Link to Router1
+          - ip address 10.0.0.6 255.255.255.252
+          - no shutdown
+        parents: interface GigabitEthernet0/1
+      when: inventory_hostname == "Router2"
+
+    # ── Task 4: Configure OSPF routing ──
+    - name: Configure OSPF - Router0
+      ios_config:
+        lines:
+          - network 192.168.1.0 0.0.0.255 area 0
+          - network 10.0.0.0 0.0.0.3 area 0
+        parents: router ospf 1
+      when: inventory_hostname == "Router0"
+
+    - name: Configure OSPF - Router1
+      ios_config:
+        lines:
+          - network 192.168.2.0 0.0.0.255 area 0
+          - network 10.0.0.0 0.0.0.3 area 0
+          - network 10.0.0.4 0.0.0.3 area 0
+        parents: router ospf 1
+      when: inventory_hostname == "Router1"
+
+    - name: Configure OSPF - Router2
+      ios_config:
+        lines:
+          - network 192.168.3.0 0.0.0.255 area 0
+          - network 10.0.0.4 0.0.0.3 area 0
+        parents: router ospf 1
+      when: inventory_hostname == "Router2"
+
+    # ── Task 5: Save configuration ──
+    - name: Save running configuration
+      ios_config:
+        save_when: always
