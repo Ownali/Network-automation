@@ -1,0 +1,29 @@
+!==================================================
+! Device    : Router2
+! Generated : 2026-05-31 12:56:49
+! Author    : Own Ali | F20232661030
+!==================================================
+
+enable
+configure terminal
+
+hostname Router2
+
+interface GigabitEthernet0/0
+ description LAN - Switch2
+ ip address 192.168.3.1 255.255.255.0
+ no shutdown
+!
+interface GigabitEthernet0/1
+ description WAN - Link to Router1
+ ip address 10.0.0.6 255.255.255.252
+ no shutdown
+!
+
+router ospf 1
+ network 192.168.3.0 0.0.0.255 area 0
+ network 10.0.0.4 0.0.0.3 area 0
+!
+
+end
+write memory
