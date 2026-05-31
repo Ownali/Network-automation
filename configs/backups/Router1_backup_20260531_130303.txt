@@ -1,0 +1,32 @@
+
+!==================================================
+! Running Configuration - Router1
+! Backed up: 2026-05-31 13:03:03
+! Author   : Own Ali | F20232661030
+!==================================================
+
+version 15.1
+hostname Router1
+
+!
+interface GigabitEthernet0/0
+ description LAN - Switch1
+ ip address 192.168.2.1 255.255.255.0
+ no shutdown
+!
+interface GigabitEthernet0/1
+ description WAN - Link to Router0
+ ip address 10.0.0.2 255.255.255.252
+ no shutdown
+!
+interface GigabitEthernet0/2
+ description WAN - Link to Router2
+ ip address 10.0.0.5 255.255.255.252
+ no shutdown
+!
+router ospf 1
+ network 192.168.2.0 0.0.0.255 area 0
+ network 10.0.0.0 0.0.0.3 area 0
+ network 10.0.0.4 0.0.0.3 area 0
+!
+end
