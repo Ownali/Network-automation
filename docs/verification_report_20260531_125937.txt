@@ -1,0 +1,28 @@
+=======================================================
+       NETWORK VERIFICATION REPORT
+       Author : Own Ali | Roll: F20232661030
+       Time   : 2026-05-31 12:59:00
+=======================================================
+
+  Device                     IP                  Result
+-------------------------------------------------------
+  Router0 - LAN              192.168.1.1         FAIL
+  Router0 - WAN              10.0.0.1            FAIL
+  Router1 - LAN              192.168.2.1         FAIL
+  Router1 - WAN0             10.0.0.2            FAIL
+  Router1 - WAN1             10.0.0.5            PASS
+  Router2 - LAN              192.168.3.1         FAIL
+  Router2 - WAN              10.0.0.6            PASS
+  PC0                        192.168.1.10        FAIL
+  PC1                        192.168.1.11        FAIL
+  PC2                        192.168.2.10        FAIL
+  PC3                        192.168.2.11        FAIL
+  PC4                        192.168.3.10        FAIL
+  PC5                        192.168.3.11        FAIL
+
+-------------------------------------------------------
+  Total  : 13
+  Passed : 2
+  Failed : 11
+  Status : SOME DEVICES UNREACHABLE
+-------------------------------------------------------
